@@ -5,6 +5,7 @@ using namespace std;
 //FILENAME
 const char* ARCHIVO_EMPRESAS = "empresas2.dat";
 
+//CARGAR CADENA
 void cargarCadena(char *pal, int tam){
     int i;
     fflush (stdin);
@@ -15,7 +16,7 @@ void cargarCadena(char *pal, int tam){
     pal[i]='\0';
     fflush(stdin);
 }
-
+//FUNCION LIMPIAR ARCHIVO
 void limpiarArchivo(){
     FILE *p;
     p=fopen("cat15.dat", "wb");
@@ -271,7 +272,7 @@ void bajaEmpresa() {
     emp = seleccionarEmpresa(pos);
     emp.setEstado(false);
     modificarEmpresa(emp, pos);
-    cout << "La empresa fue dadaa de baja" << endl;
+    cout << "La empresa fue dada de baja" << endl;
 }
 
 //FUNCION PARA MODIFICAR CATEGORIA EMPRESA
@@ -330,6 +331,7 @@ void catMaxEmp() {
     while(fread(&emp, sizeof(Empresa), 1, p) == 1) {
         cats[emp.getCategoria().getNumero() - 1] += emp.getCantEmpleados();
     }
+    fclose(p);
     int nroMaxEmp = 0;
     int catMax;
     for(int i=0;i<80;i++) {
@@ -430,6 +432,20 @@ void listarEmpresasCat15() {
     fclose(p);
 }
 
+//FUNCION CANT EMPRESAS
+void cantEmpresas() {
+    FILE *p;
+    p = fopen(ARCHIVO_EMPRESAS, "rb");
+    if(p==NULL) {
+        cout << "FILE ERROR" << endl;
+        exit(1);
+    }
+    fseek(p, sizeof(Empresa) * 0, 2);
+    cout << ftell(p) << endl;
+    cout << "Cant empresas: " << ftell(p) / sizeof(Empresa) << endl;
+    fclose(p);
+}
+
 //FUNCION MAIN
 int main() {
     int eleccion;
@@ -443,11 +459,12 @@ int main() {
         cout << "4- LISTAR ELEMENTOS" << endl;
         cout << "5- CANTIDAD DE MUNICIPIOS CON MENOS DE 200.000 HABITANTES" << endl;
         cout << "6- EMPRESAS CON CATEGORIA 15" << endl;
+        cout << "7- CANTIDAD TOTAL DE EMPRESAS" << endl;
         cout << "0- SALIR" << endl;
         cout << "Ingrese 0, 1, 2, 3, 4, 5 o 6: " << endl;
         cin >> eleccion;
 
-        if(eleccion >= 0 && eleccion < 7) {
+        if(eleccion >= 0 && eleccion < 8) {
             num = true;
         }
     }
@@ -473,8 +490,18 @@ int main() {
     case 6:
         listarEmpresasCat15();
         break;
+    case 7:
+        cantEmpresas();
+        break;
 
     }
 
     return 0;
 }
+
+
+//class ArchivoEmpresas {
+//    private:
+//        char nombre[30];
+//};
+
