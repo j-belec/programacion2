@@ -503,5 +503,7 @@ int main() {
 //class ArchivoEmpresas {
 //    private:
 //        char nombre[30];
+//    public:
+//        ArchivoEmpresas(const char* nombre)
 //};
 
