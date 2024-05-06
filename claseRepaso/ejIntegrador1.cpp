@@ -2,6 +2,9 @@
 #include <string.h>
 using namespace std;
 
+const char* ARCHIVO_TARJETAS = "Tarjetas.dat";
+const char* ARCHIVO_VIAJES = "Viajes.dat";
+
 //CARGAR CADENA
 void cargarCadena(char *pal, int tam){
     int i;
@@ -65,7 +68,7 @@ void Tarjeta::Mostrar() {
 class Viaje {
     private:
         int _nroViaje;
-        int _nroTarjeta; //?????
+        int _nroTarjeta;
         int _medioTransporte;
         char _fecha[30];
         float _importe;
@@ -112,4 +115,44 @@ void Viaje::Mostrar() {
         cout << "Fecha: " << _fecha << endl;
         cout << "Importe: " << _importe << endl;
     }
+}
+
+//EJERCICIOS//////////////////////////////////////////////////////////////////////////////
+void funcionA() {
+    int num;
+    cout << "Ingrese numero de tarjeta: " << endl;
+    cin >> num;
+    int contColectivo = 0;
+    int contSubte = 0;
+    int contTren = 0;
+
+    FILE *p;
+    p = fopen(ARCHIVO_VIAJES, "rb");
+    if(p==NULL) {
+        cout << "FILE ERROR" << endl;
+        exit(1);
+    }
+    Viaje viaje;
+    while(fread(&viaje, sizeof(Viaje), 1, p) == 1) {
+        if(num == viaje.getNroTarjeta()) {
+            if(viaje.getMedioTransporte() == 1) {
+                contColectivo++;
+            } else if(viaje.getMedioTransporte() == 2) {
+                contSubte++;
+            } else {
+                contTren++;
+            }
+        }
+    }
+    fclose(p);
+
+    cout << "Para la tarjeta con numero " << num << ", los cantidad de viajes q realizo fue: " << endl;
+    cout << "En colectivo: " << contColectivo << endl;
+    cout << "En subte: " << contSubte << endl;
+    cout << "En tren: " << contTren << endl;
+}
+
+
+int main() {
+    return 0;
 }
