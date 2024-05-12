@@ -152,6 +152,25 @@ void funcionA() {
     cout << "En tren: " << contTren << endl;
 }
 
+void funcionB() {
+    int menorImp;
+    bool band = true;
+
+    FILE *p;
+    p = fopen(ARCHIVO_VIAJES, "rb");
+    if(p==NULL){
+        cout << "FILE ERROR" << endl;
+        exit(1);
+    }
+    Viaje viaje;
+    while(fread(&viaje,sizeof(Viaje),1,p)==1){
+        if(band) {
+            menorImp = viaje.getImporte();
+        }
+
+    }
+}
+
 
 int main() {
     return 0;
