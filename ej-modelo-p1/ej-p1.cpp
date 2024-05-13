@@ -1,7 +1,108 @@
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include "parcialm1.h"
 using namespace std;
+
+//class ArchivoGenerico
+//{
+//private:
+//    char _nombre[30];
+//
+//public:
+//    ArchivoGenerico(const char *nombre = "data.dat")
+//    {
+//        setNombre(nombre);
+//    }
+//    const char *getNombre() { return _nombre; };
+//	void setNombre(const char *nombre)
+//	{
+//		strcpy(_nombre, nombre);
+//	};
+//    T leerRegistro(int pos){
+//        T obj;
+//        // obj.setNumero(-1);
+//        FILE *p;
+//        p = fopen("viajes.dat", "rb");
+//        if (p == nullptr)
+//        {
+//            cout << "ERROR DE ARCHIVO" << endl;
+//            // obj.setNumero(-2);
+//            return obj;
+//        }
+//        fseek(p, pos * sizeof obj, 0);
+//        fread(&obj, sizeof obj, 1, p);
+//        fclose(p);
+//        return obj;
+//    };
+//    void grabarRegistro(T obj)
+//    {
+//        FILE *p;
+//        p = fopen(this->getNombre(), "ab");
+//        if (p == nullptr)
+//        {
+//            cout << "ERROR DE ARCHIVO" << endl;
+//            return;
+//        }
+//        int cantGrabados = fwrite(&obj, sizeof obj, 1, p);
+//        cout << cantGrabados << endl;
+//        fclose(p);
+//    };
+//
+//    int contarRegistros()
+//    {
+//        FILE *p;
+//        T obj;
+//
+//        p = fopen(this->getNombre(), "rb");
+//        if (p == nullptr)
+//        {
+//            cout << "ERROR DE ARCHIVO" << endl;
+//            return -2;
+//        }
+//
+//        fseek(p, 0, SEEK_END);
+//        int tamArchivo = ftell(p);
+//        int tamT = sizeof obj;
+//
+//        cout << tamArchivo << ", " << tamT << endl;
+//
+//        fclose(p);
+//
+//        return tamArchivo / tamT;
+//    };
+//
+//    // modificarRegistro(Empresa obj, int pos){};
+//    void listarRegistros()
+//    {
+//        T obj;
+//        int cant = contarRegistros();
+//
+//        cout << "Listando " << cant << " registros..." << endl;
+//
+//        for (int i = 0; i < cant; i++)
+//        {
+//            obj = leerRegistro(i);
+//            obj.Mostrar();
+//        }
+//    };
+//
+//    int buscarRegistro(int numRegistro)
+//    {
+//        T obj;
+//        int cant = contarRegistros();
+//
+//        for (int i = 0; i < cant; i++)
+//        {
+//            obj = leerRegistro(i);
+//
+//            if (obj.getNumero() == numRegistro)
+//            {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    };
+//};
 
 class Punto1 {
     private:
@@ -30,37 +131,23 @@ void Punto1::Mostrar() {
 }
 
 void fcPunto1() {
-    FILE *p;
-    p = fopen("obras.dat", "rb");
-    if(p==NULL) {
-        cout << "FILE ERROR";
-        exit(1);
-    }
-
-    FILE *q;
-    q = fopen("punto1.dat", "wb");
-    fclose(q);
-
-    q = fopen("punto1.dat", "ab");
-    if(q==NULL) {
-        cout << "FILE ERROR";
-        exit(1);
-    }
-
-    Obra ob;
-    Punto1 p1;
-
-    while(fread(&ob, sizeof(Obra), 1, p) == 1) {
-        if(ob.getEstadoEjecucion() == 1) {
-            p1.setCodigoObra(ob.getCodigoObra());
-            p1.setDireccion(ob.getDireccion());
-            p1.setProvincia(ob.getProvincia());
-            fwrite(&p1, sizeof(Punto1), 1, q);
+    ArchivoObras archObras("obras.dat");
+    int totalRegsObras = archObras.contarRegistros();
+    Obra objObra;
+    for(int i=0;i<totalRegsObras;i++) {
+        objObra = archObras.leerRegistro(i);
+        Punto1 objP1;
+        if(objObra.getEstadoEjecucion()==3 && objObra.getActivo()) {
+            objP1.setCodigoObra(objObra.getCodigoObra());
+            objP1.setDireccion(objObra.getDireccion());
+            objP1.setProvincia(objObra.getProvincia());
+            FILE *p;
+            p=fopen("punto1.dat", "ab");
+            if(p==NULL){return;}
+            fwrite(&objP1,sizeof(objP1),1,p);
+            fclose(p);
         }
     }
-
-    fclose(q);
-    fclose(p);
 }
 
 void fcPunto1B() {
@@ -119,6 +206,32 @@ void fcPunto2() {
 }
 
 //FUNCION PUNTO A1/////////////////////////////////////////////////////////////////////////////////////
+int cantComprasPorMaterial(int codMaterial) {
+    int cantCompras = 0;
+     ArchivoCompras archCompras("compras.dat");
+     int totalCompras = archCompras.contarRegistros();
+     Compra comp;
+     for(int i=0;i<totalCompras;i++) {
+         comp = archCompras.leerRegistro(i);
+         if(comp.getCodigoMaterial() == codMaterial && comp.getActivo()) {
+             cantCompras++;
+         }
+     }
+    return cantCompras;
+}
+
+void fcPuntoA1() {
+    ArchivoMateriales archMat("materiales.dat");
+    int totalMateriales = archMat.contarRegistros();
+    Material mat;
+    for(int i=0;i<totalMateriales;i++) {
+        mat = archMat.leerRegistro(i);
+        int codMaterial = mat.getCodigoMaterial();
+        int cantCompras = cantComprasPorMaterial(codMaterial);
+        cout << "El material con codigo " << codMaterial << " tiene " << cantCompras << " compras" << endl;
+    }
+}
+
 //FUNCION PUNTO A2/////////////////////////////////////////////////////////////////////////////////////
 void fcPuntoA2() {
     float provsArr[60]{0};
@@ -174,6 +287,32 @@ void fcPuntoA3() {
 }
 
 //FUNCION PUNTO A4/////////////////////////////////////////////////////////////////////////////////////
+int fcAux( int codMaterial) {
+   ArchivoCompras archCompras("compras.dat");
+        int totalRegsCompras = archCompras.contarRegistros();
+        Compra objCompra;
+        int cantCompras = 0;
+        for(int i=0;i<totalRegsCompras;i++) {
+            objCompra = archCompras.leerRegistro(i);
+            if(objCompra.getCodigoMaterial() == codMaterial) {
+                cantCompras++;
+            }
+        }
+        return cantCompras;
+}
+
+void fcPuntoA1B() {
+    ArchivoMateriales archMateriales("materiales.dat");
+    int totalRegsMateriales = archMateriales.contarRegistros();
+    Material objMaterial;
+    for(int i=0;i<totalRegsMateriales;i++) {
+        objMaterial = archMateriales.leerRegistro(i);
+        int codMaterial = objMaterial.getCodigoMaterial();
+        int cantCompras = fcAux(codMaterial);
+        cout << "Para el material con codigo " << objMaterial.getCodigoMaterial() << " se compro " << cantCompras << " cantidad." << endl;
+    }
+
+}
 
 //FUNCION PUNTO A5/////////////////////////////////////////////////////////////////////////////////////
 void fcPuntoA5() {
@@ -190,46 +329,101 @@ void fcPuntoA5() {
         if(provinciasArr[i] >= 22) cout << "Prov numero: " << i + 1 << endl;
     }
 }
+//FUNCION PUNTO A6/////////////////////////////////////////////////////////////////////////////////////
+void fcPuntoA6() {
+    ArchivoCompras archComp("compras.dat");
+    int totalRegs = archComp.contarRegistros();
+    Compra comp;
+    for(int i=0;i<totalRegs;i++) {
+        comp = archComp.leerRegistro(i);
+        if(comp.getFechaCompra().getAnio() == 2020) {
+            comp.setActivo(false);
+            FILE *p;
+            p=fopen("compras.dat", "rb+");
+            fseek(p, sizeof(Compra)*i, 0);
+            fwrite(&comp, sizeof(Compra), 1, p);
+            fclose(p);
+        }
+    }
+}
+
+void fcPuntoA6B() {
+    FILE *p;
+    p=fopen("compras.dat", "rb+");
+    if(p==NULL){return;}
+    Compra objCompra;
+    int contador = 0;
+    while(fread(&objCompra,sizeof(Compra),1,p)==1) {
+        if(objCompra.getFechaCompra().getAnio()==2020) {
+            objCompra.setActivo(false);
+            fseek(p,sizeof(Compra)*contador,0);
+            fwrite(&objCompra,sizeof(Compra),1,p);
+            fseek(p, 0, SEEK_CUR);
+        }
+        contador++;
+    }
+    fclose(p);
+}
+
+//FUNCION PUNTO A7/////////////////////////////////////////////////////////////////////////////////////
+void fcPuntoA7() {
+    ArchivoMateriales archMateriales("materiales.dat");
+    int totalRegsMateriales = archMateriales.contarRegistros();
+    Material objMaterial;
+    for(int i=0;i<totalRegsMateriales;i++) {
+        objMaterial = archMateriales.leerRegistro(i);
+        if(strcmp(objMaterial.getNombre(),"abertura") == 0) {
+            float nuevoPU = objMaterial.getPU() + objMaterial.getPU() * 0.1;
+            objMaterial.setPU(nuevoPU);
+            FILE *p;
+            p=fopen("materiales.dat", "rb+");
+            fseek(p,sizeof(Material)*i,0);
+            fwrite(&objMaterial,sizeof(Material),1,p);
+            fclose(p);
+        }
+    }
+}
 
 //MIS FUNCIONES/////////////////////////////////////////////////////////////////////////////////////
 void agregarReg() {
-//  el file ya tiene q existir porq uso append
     FILE *p;
-    p = fopen("proveedores.dat", "ab");
+    p = fopen("materiales.dat", "ab");
     if(p==NULL) {
         cout << "FILE ERROR FC AGREGAR";
         exit(1);
     }
-    Proveedor ob;
+    Material ob;
     ob.Cargar();
-    fwrite(&ob, sizeof(Proveedor), 1, p);
+    fwrite(&ob, sizeof(Material), 1, p);
     fclose(p);
 }
 
 void leerRegs() {
     FILE *p;
-    p = fopen("compras.dat", "rb");
+    p = fopen("materiales.dat", "rb");
     if(p==NULL) {
         cout << "FILE ERROR FC LEER";
         exit(1);
     }
-    Compra ob;
-    while(fread(&ob, sizeof(Compra), 1, p)==1) {
+    Material ob;
+    while(fread(&ob, sizeof(Material), 1, p)==1) {
         ob.Mostrar();
     }
     fclose(p);
 }
 
 int main() {
-//    fcPunto1B();
 //    agregarReg();
-//    agregarReg();
+//    fcPuntoA7();
 //    leerRegs();
+//    agregarReg();
+//    fcPunto1();
 //    fcPunto2();
-//    fcPuntoA2();
+//    fcPuntoA1();
+    fcPuntoA1B();
 //    fcPuntoA3();
-    fcPuntoA5();
-
+//    fcPuntoA5();
+//    fcPuntoA6();
     return 0;
 }
 

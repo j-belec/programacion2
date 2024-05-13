@@ -131,10 +131,17 @@ private:
     bool activo;
 public:
     void Cargar(){
+        cout << "cod mat:";
         cin>>codigoMaterial;
+        cin.ignore();
+        cout << "nombre: ";
         cargarCadena(nombre,29);
+        cin.ignore();
+        cout << "marca: ";
         cargarCadena(marca,29);
+        cout << "tipo:";
         cin>>tipo;
+        cout << "pu:";
         cin>>pu;
         activo=true;
     }
@@ -144,6 +151,7 @@ public:
         cout<<marca<<endl;
         cout<<tipo<<endl;
         cout<<pu<<endl;
+        cout << endl;
         if(!activo) cout<<"ESTA BORRADO"<<endl<<endl;
     }
     int getCodigoMaterial(){return codigoMaterial;}
@@ -202,12 +210,19 @@ private:
     bool activo;
 public:
     void Cargar(){
+        cout << "nro compra:";
         cin>>numeroCompra;
+        cout << "nro prov:";
         cin>>numeroProveedor;
+        cout << "nro mat:";
         cin>>codigoMaterial;
+        cout << "cod obra:";
         cargarCadena(codigoObra,4);
+        cout << "cant:";
         cin>>cantidad;
+        cout << "imp:";
         cin>>importe;
+        cout << "fecha: d/m/a:";
         fechaCompra.Cargar();
         activo=true;
     }
