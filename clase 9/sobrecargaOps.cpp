@@ -22,7 +22,7 @@ class Cadena{
             strcpy(palabras, cad);
         }
 
-        void concatenar(const char *cad) {
+        void operator+=(const char *cad) { //la sobrecarga de operadores solo puede tener un solo parametro
             char *cadAux = new char[tam];
             if(cadAux==nullptr)exit(-1);
             strcpy(cadAux, palabras);
@@ -31,7 +31,7 @@ class Cadena{
             int tamTotal = tam + tamCad;
 
             delete[]palabras;
-
+            
             palabras = new char[tamTotal];
             if(palabras==nullptr){
                 delete[] cadAux;
@@ -60,8 +60,7 @@ class Cadena{
 
 int main(){
     Cadena cad("hola");
-
-    cad.concatenar(" mundo!");
+    cad+=(" mundo!");                              //se usa asi
     cout<<cad.getPalabras()<<endl;
     ///hola mundo!
     return 0;
